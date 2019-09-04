@@ -26,16 +26,22 @@
         android:id="@+id/nanyi"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="丈母娘饭局"/>
+        android:text="情侣园"/>
+
     <Button
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/pukou"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nanyi"
-        android:text="浦口"/>
-
+        android:text="6鼓"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/home"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pukou"
+        android:text="家"/>
     <Button
         android:id="@+id/ok"
         android:text="确定"

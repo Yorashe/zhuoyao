@@ -35,7 +35,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.recovery.callback.RecoveryCallback;
+import com.recovery.core.Recovery;
+
 import java.util.Locale;
+
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
 public class MainActivity extends AppCompatActivity implements SteeringWheelView.SteeringWheelListener {
 
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
     private LocationManager mLocationManager;
     private Location mLastLocation;
     private SteeringWheelView mSteeringWheel;
-    private Button mSettings, mUp, mDown, mLeft, mRight, mNanYi, mOK, mPukou;
+    private Button mSettings, mUp, mDown, mLeft, mRight, mNanYi, mOK, mPukou,mHome;
     private TextView mPosition;
 
     private EditText mEdLat, mEdLng;
@@ -105,12 +110,24 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mNanYi = (Button) findViewById(R.id.nanyi);
+        mHome = (Button) findViewById(R.id.home);
         mPukou = (Button) findViewById(R.id.pukou);
         mOK = (Button) findViewById(R.id.ok);
         mPosition = (TextView) findViewById(R.id.position);
         mEdLat = (EditText) findViewById(R.id.edlat);
         mEdLng = (EditText) findViewById(R.id.edlng);
         mSettings = (Button) findViewById(R.id.settings);
+
+        Recovery.getInstance()
+                .debug(true)
+                .recoverInBackground(false)
+                .recoverStack(true)
+                .mainPage(MainActivity.class)
+                .recoverEnabled(true)//上线时关闭debug
+                .callback(new MyCrashCallback())
+                .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
+                .skip(MainActivity.class)
+                .init(this);
         mSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,17 +202,28 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
         mNanYi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                lastLat = 32.1061839942;
-//                lastLng = 118.8405750236;
-                lastLat = DEFAULT_LAT;
-                lastLng = DEFAULT_LNG;
+
+                lastLat = 32.0698858439;
+                lastLng = 118.8099972178;//                lastLat = DEFAULT_LAT;
+//                lastLng = DEFAULT_LNG;
+//                lastLat = 31.6815580309;
+//                lastLng = 118.5095823087;
             }
         });
         mPukou.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                lastLat = 32.1102023429;
-                lastLng = 118.7000463853;
+                lastLat = 32.02840640330002;
+                lastLng = 118.75872971120003;
+//                lastLat = 32.1102023429;
+//                lastLng = 118.7000463853;
+            }
+        });
+        mHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lastLat = 32.1070928936;
+                lastLng = 118.8403394390;
             }
         });
 
@@ -228,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
                 lastLng = mLastLocation.getLongitude();
             } else {
                 Log.w(TAG, "last known location is null?");
-
             }
 
 
@@ -284,7 +311,11 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
     private void addFloatView() {
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mWindowLayoutParams = new WindowManager.LayoutParams();
-        mWindowLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= 26) {//8.0新特性
+            mWindowLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            mWindowLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        }
         mWindowLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         mWindowLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         mWindowLayoutParams.x = 0;
@@ -718,6 +749,25 @@ public class MainActivity extends AppCompatActivity implements SteeringWheelView
         lastLng += (double) (mStepIndex * STEP_GAP) * f;
         updateMockLocation(lastLng, lastLat);
 
+    }
+    public static final class MyCrashCallback implements RecoveryCallback {
+        @Override
+        public void stackTrace(String exceptionMessage) {
+        }
+
+        @Override
+        public void cause(String cause) {
+        }
+
+        @Override
+        public void exception(String exceptionType, String throwClassName, String throwMethodName, int throwLineNumber) {
+
+        }
+
+        @Override
+        public void throwable(Throwable throwable) {
+
+        }
     }
 
 
